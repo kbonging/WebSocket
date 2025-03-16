@@ -1,7 +1,6 @@
 package com.boot.project.config;
 
-import com.boot.project.handler.ChatWebSocketHandler;
-import org.springframework.context.annotation.Bean;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -10,15 +9,13 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocket
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
+
+    private final WebSocketHandler webSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatWebSocketHandler(), "/chat").setAllowedOrigins("*");
-    }
-
-    @Bean
-    public WebSocketHandler chatWebSocketHandler() {
-        return new ChatWebSocketHandler();
+        registry.addHandler(webSocketHandler, "/chat").setAllowedOrigins("*");
     }
 }

@@ -3,69 +3,68 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>웹소켓 채팅</title>
-</head>
-<body>
-    <h1>웹소켓 채팅</h1>
-    커밋 테스ㅡ111111111111
-    <div>
-        <!-- 채팅방 ID 입력 -->
-        <input type="text" id="chatRoomId" placeholder="채팅방 ID" />
-    </div>
-
-    <div>
-        <!-- 메시지 입력 -->
-        <input type="text" id="messageInput" placeholder="메시지 입력" />
-    </div>
-
-    <div>
-        <!-- 메시지 보내기 버튼 -->
-        <button onclick="sendMessage()">메시지 보내기</button>
-    </div>
-
+    <title>WebSocket Chat</title>
     <script>
-        let socket;
+        let ws;
+        let userName;
 
-        // 웹소켓 연결
-        function connectToChat() {
-            const chatRoomId = document.getElementById("chatRoomId").value;
-            if (!chatRoomId) {
-                alert("채팅방 ID를 입력하세요!");
+        function connectWebSocket() {
+            userName = document.getElementById("userName").value.trim();
+            if (!userName) {
+                alert("이름을 입력하세요!");
                 return;
             }
 
-            // 웹소켓 연결
-            socket = new WebSocket("ws://localhost:8090/chat");
+            ws = new WebSocket("ws://localhost:8090/chat?userName=" + encodeURIComponent(userName));
 
-            socket.onopen = () => {
-                console.log("웹소켓 연결 성공!");
-                // 채팅방 ID를 서버로 전송 (세션에 저장될 수 있도록)
-                socket.send(JSON.stringify({ chatRoomId: chatRoomId }));
+            ws.onopen = function() {
+                console.log("웹소켓 연결됨");
+                document.getElementById("status").innerText = "연결됨";
             };
 
-            socket.onmessage = (event) => {
-                console.log("서버 메시지:", event.data);
+            ws.onmessage = function(event) {
+                const chatBox = document.getElementById("chatBox");
+                const newMessage = document.createElement("p");
+                newMessage.innerText = event.data;
+                chatBox.appendChild(newMessage);
             };
 
-            socket.onclose = () => {
-                console.log("웹소켓 연결 종료");
+            ws.onclose = function() {
+                console.log("웹소켓 종료됨");
+                document.getElementById("status").innerText = "연결 종료";
+            };
+
+            ws.onerror = function(error) {
+                console.error("웹소켓 오류", error);
             };
         }
 
-        // 메시지 보내기
         function sendMessage() {
-            const message = document.getElementById("messageInput").value;
-            if (message && socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(message); // 메시지를 서버로 전송
-                document.getElementById("messageInput").value = ""; // 입력창 초기화
-            } else {
-                alert("웹소켓 연결이 열리지 않았습니다.");
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("웹소켓이 연결되지 않았습니다.");
+                return;
+            }
+            let message = document.getElementById("message").value.trim();
+            if (message) {
+                ws.send(message);
+                document.getElementById("message").value = "";
             }
         }
-
-        // 채팅방 연결
-        document.getElementById("chatRoomId").addEventListener("change", connectToChat);
     </script>
+</head>
+<body>
+    <h2>웹소켓 채팅</h2>
+    <div>
+        <label>이름: <input type="text" id="userName"></label>
+        <button onclick="connectWebSocket()">채팅 시작</button>
+        <p id="status">연결되지 않음</p>
+    </div>
+
+    <div id="chatBox" style="border:1px solid #000; width:300px; height:200px; overflow:auto;"></div>
+
+    <div>
+        <input type="text" id="message" placeholder="메시지를 입력하세요">
+        <button onclick="sendMessage()">전송</button>
+    </div>
 </body>
 </html>
