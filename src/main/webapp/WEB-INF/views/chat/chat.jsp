@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>index 페이지</title>
+    <title>채팅 페이지</title>
     <script>
         let ws;
         let userName;
