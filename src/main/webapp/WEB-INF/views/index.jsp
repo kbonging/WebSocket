@@ -53,7 +53,8 @@
     </script>
 </head>
 <body>
-    <h2>웹소켓 채팅</h2>
+
+    <!-- <h2>웹소켓 채팅</h2>
     <div>
         <label>이름: <input type="text" id="userName"></label>
         <button onclick="connectWebSocket()">채팅 시작</button>
@@ -65,6 +66,17 @@
     <div>
         <input type="text" id="message" placeholder="메시지를 입력하세요">
         <button onclick="sendMessage()">전송</button>
-    </div>
+    </div> -->
+    <a href="/chatPage">채팅방 입장하기</a>
+    <h2>채팅방 입장</h2>
+    <form action="/chatPage" method="get">
+        <label for="username">이름:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="roomId">채팅방 번호:</label>
+        <input type="number" id="roomId" name="roomId" required>
+        <br>
+        <button type="submit">입장하기</button>
+    </form>
 </body>
 </html>
